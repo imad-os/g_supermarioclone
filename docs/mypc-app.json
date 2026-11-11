@@ -1,0 +1,33 @@
+{
+  "mypc": 1,
+  "id": "golden-trail",
+  "name": "Pip's Golden Trail",
+  "description": "Explore 10 worlds and 90 stages with Pip and Juniper to reclaim the Golden Trail from the Rust Baron.",
+  "type": "game",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "version": "1.0.0",
+  "scores": true,
+  "config": {
+    "orientation": "landscape",
+    "kid_mode": "auto",
+    "remote_autorun": true,
+    "speed": 1
+  },
+  "touch": {
+    "buttons": [
+      { "label": "B", "action": "ok", "place": "bottom" },
+      { "label": "A", "action": "b", "place": "right" },
+      { "label": "Y", "action": "run", "place": "left" },
+      { "label": "X", "action": "run", "place": "top" }
+    ],
+    "catalog": [
+      { "label": "B", "action": "ok", "place": "bottom" },
+      { "label": "A", "action": "b", "place": "right" },
+      { "label": "Y", "action": "run", "place": "left" },
+      { "label": "X", "action": "run", "place": "top" },
+      { "label": "-", "action": "menu", "place": "left" }
+    ],
+    "scale": { "stick": 1.25, "btn": 1.25 }
+  }
+}

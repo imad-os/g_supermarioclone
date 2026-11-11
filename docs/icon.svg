@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#132238"/>
+      <stop offset="55%" stop-color="#1e3d58"/>
+      <stop offset="100%" stop-color="#0f2537"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff3a1"/>
+      <stop offset="45%" stop-color="#ffd23f"/>
+      <stop offset="100%" stop-color="#d98200"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="44" fill="url(#bg)"/>
+  <circle cx="196" cy="64" r="38" fill="url(#coin)" stroke="#7a4400" stroke-width="5"/>
+  <polygon points="196,38 203,53 220,55 207,66 211,83 196,74 181,83 185,66 172,55 189,53" fill="#fff7c2"/>
+  <path d="M24 202 Q90 165 232 195 L232 256 L24 256 Z" fill="#2e7d32"/>
+  <!-- Pip Fox Ears -->
+  <polygon points="68,108 54,54 98,86" fill="#e66820" stroke="#421c04" stroke-width="5" stroke-linejoin="round"/>
+  <polygon points="70,98 62,66 88,86" fill="#ffd9b3"/>
+  <polygon points="146,108 164,54 118,86" fill="#e66820" stroke="#421c04" stroke-width="5" stroke-linejoin="round"/>
+  <polygon points="142,98 152,66 126,86" fill="#ffd9b3"/>
+  <!-- Explorer Cap -->
+  <path d="M64 92 Q108 64 152 92 Z" fill="#218380" stroke="#0c3c3a" stroke-width="5"/>
+  <path d="M108 82 L166 92 Q148 102 108 94 Z" fill="#17615e" stroke="#0c3c3a" stroke-width="4"/>
+  <!-- Pip Head -->
+  <ellipse cx="108" cy="128" rx="46" ry="38" fill="#f27a24" stroke="#421c04" stroke-width="5"/>
+  <path d="M64 132 Q86 118 108 136 Q130 118 152 132 Q144 164 108 166 Q72 164 64 132 Z" fill="#fff3e0"/>
+  <!-- Eyes & Nose -->
+  <ellipse cx="90" cy="122" rx="6" ry="9" fill="#1b1b1b"/>
+  <circle cx="88" cy="119" r="2.5" fill="#ffffff"/>
+  <ellipse cx="126" cy="122" rx="6" ry="9" fill="#1b1b1b"/>
+  <circle cx="124" cy="119" r="2.5" fill="#ffffff"/>
+  <polygon points="108,132 101,140 115,140" fill="#2b1708"/>
+  <!-- Teal Explorer Scarf -->
+  <path d="M70 160 Q108 174 146 160 L152 178 Q108 190 64 178 Z" fill="#2ec4b6" stroke="#0b4f4a" stroke-width="5"/>
+  <path d="M132 170 L172 198 L156 214 L120 182 Z" fill="#2ec4b6" stroke="#0b4f4a" stroke-width="5"/>
+</svg>

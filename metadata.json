@@ -1,0 +1,6 @@
+{
+  "name": "Pip's Golden Trail",
+  "description": "Classic 2D side-scrolling platformer for My PC: explore 10 original worlds and 90 stages with Pip and Juniper to reclaim the Golden Trail from the Rust Baron.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
