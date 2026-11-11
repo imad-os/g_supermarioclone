@@ -204,20 +204,9 @@
       return false;
     }
 
-    // Kid Mode: 5 bubble rescues before losing a life
-    if (state.kidMode && state.kidBubbleLives > 0) {
-      state.kidBubbleLives--;
-      p.bubbled = true;
-      p.vx = 0;
-      p.vy = -2;
-      p.hurtTimer = TUNE.hurtInvulnFrames;
-      if (state.onEvent) state.onEvent('bubble', p.x, p.y);
-      return false;
-    }
-
-    // Multiplayer co-op: if another player is alive and not bubbled, enter bubble instead of full wipe
+    // Multiplayer co-op check: is another player alive and unbubbled?
+    var otherAlive = false;
     if (state.players && state.players.length > 1) {
-      var otherAlive = false;
       for (var i = 0; i < state.players.length; i++) {
         var o = state.players[i];
         if (o !== p && o.active && !o.dead && !o.bubbled) {
@@ -225,14 +214,32 @@
           break;
         }
       }
+    }
+
+    // Kid Mode: 5 extra shield rescues before losing a life
+    // In 1P solo mode, grant instant shield hop + invulnerability frames without locking player in a bubble!
+    if (state.kidMode && state.kidBubbleLives > 0) {
+      state.kidBubbleLives--;
       if (otherAlive) {
         p.bubbled = true;
         p.vx = 0;
         p.vy = -2;
-        p.hurtTimer = TUNE.hurtInvulnFrames;
-        if (state.onEvent) state.onEvent('bubble', p.x, p.y);
-        return false;
+      } else {
+        p.vy = -5.2;
       }
+      p.hurtTimer = TUNE.hurtInvulnFrames;
+      if (state.onEvent) state.onEvent('hurt', p.x, p.y);
+      return false;
+    }
+
+    // Multiplayer co-op: if another player is alive and not bubbled, enter bubble instead of full wipe
+    if (otherAlive) {
+      p.bubbled = true;
+      p.vx = 0;
+      p.vy = -2;
+      p.hurtTimer = TUNE.hurtInvulnFrames;
+      if (state.onEvent) state.onEvent('bubble', p.x, p.y);
+      return false;
     }
 
     p.dead = true;
@@ -490,6 +497,23 @@
           return;
         }
       }
+
+      // Check dynamic moving platforms (level.platforms)
+      if (level.platforms && !p.crouching) {
+        for (var pi = 0; pi < level.platforms.length; pi++) {
+          var mp = level.platforms[pi];
+          if (p.x + p.w > mp.x + 2 && p.x < mp.x + mp.w - 2) {
+            if (prevBottom <= mp.y + 6 && p.y + p.h >= mp.y && p.y + p.h <= mp.y + mp.h + 10) {
+              p.y = mp.y - p.h;
+              p.vy = 0;
+              p.onGround = true;
+              p.groundPounding = false;
+              if (mp.dx) p.x += mp.dx;
+              return;
+            }
+          }
+        }
+      }
     }
   }
 
@@ -566,8 +590,8 @@
           state.goldEnemyTimer = TUNE.goldRingDurationFrames;
           if (state.onEvent) state.onEvent('gold_gate', wx, wy);
         } else if (t === TILE.CHECKPOINT) {
-          if (!state.checkpoint || state.checkpoint.tx !== tx) {
-            state.checkpoint = { tx: tx, ty: ty, x: wx, y: wy - 8 };
+          if (!state.checkpoint || state.checkpoint.tx !== tx || state.checkpoint.stageId !== level.id) {
+            state.checkpoint = { stageId: level.id, tx: tx, ty: ty, x: wx, y: wy - 12 };
             if (p.form === 'small') applyFormSize(p, 'big');
             if (state.onEvent) state.onEvent('checkpoint', wx, wy);
           }
@@ -676,8 +700,9 @@
       releaseReserveItem(p, state);
     }
 
-    // On-demand bubble (A + LB) or pop out of bubble with B (jump)
-    if (input.bubble && !p.bubbled && p.bubbleCooldown <= 0) {
+    // On-demand bubble (A + LB in co-op) or pop out of bubble with B (jump)
+    var hasCoopPartner = !!(state.players && state.players[1] && state.players[1].active);
+    if (hasCoopPartner && input.bubble && !p.bubbled && p.bubbleCooldown <= 0) {
       p.bubbled = true;
       p.bubbleCooldown = 30;
       p.vx = 0;
@@ -685,15 +710,15 @@
       return;
     }
     if (p.bubbled) {
-      var targetX = state.cameraX + 240;
-      var targetY = 180;
+      var targetX = p.x;
+      var targetY = 160;
       if (state.leader && state.leader !== p && !state.leader.bubbled) {
         targetX = state.leader.x - 24;
         targetY = state.leader.y - 16;
       }
-      p.x += (targetX - p.x) * 0.06;
-      p.y += (targetY - p.y) * 0.06;
-      if (jumpJustPressed) {
+      p.x += (targetX - p.x) * 0.08;
+      p.y += (targetY - p.y) * 0.08;
+      if (jumpJustPressed || !hasCoopPartner) {
         p.bubbled = false;
         p.vy = -4.5;
         p.hurtTimer = 45;
@@ -993,12 +1018,14 @@
     }
 
     // Fall into bottomless pit
-    if (p.y > level.height * TUNE.tileSize + 48) {
+    if (p.y > level.height * TUNE.tileSize + 36) {
       if (state.kidMode && state.kidBubbleLives > 0) {
         state.kidBubbleLives--;
-        p.bubbled = true;
-        p.y = level.height * TUNE.tileSize - 96;
-        p.vy = -4;
+        p.y = (level.height - 5) * TUNE.tileSize;
+        p.vy = -11.5;
+        p.vx = 2.5;
+        p.hurtTimer = TUNE.hurtInvulnFrames;
+        if (state.onEvent) state.onEvent('bounce', p.x, p.y);
       } else {
         p.form = 'small';
         damagePlayer(p, state);

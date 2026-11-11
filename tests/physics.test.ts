@@ -193,3 +193,36 @@ test('100 coins grants +1 life and updates lifetimeCoins; save sanitizer validat
   assert.equal(save.lifetimeCoins, 50000);
   assert.equal(save.slots.length, 3);
 });
+
+test('Solo Kid Mode uses Heart Shield without bubble trap; checkpoints record stageId; moving platforms carry player', () => {
+  const level: any = makeTestLevel(40, 16);
+  const p = physics.createPlayer(0, 'keys');
+  const state: any = makeTestState(p);
+  state.kidMode = true;
+  state.kidBubbleLives = 5;
+
+  // Taking damage in 1P Kid Mode consumes 1 Shield and grants invulnerability without bubbling Solo Pip
+  physics.damagePlayer(p, state);
+  assert.equal(state.kidBubbleLives, 4);
+  assert.equal(p.bubbled, false, 'Solo 1P Kid Mode must not trap Player 1 in a co-op bubble');
+  assert.ok(p.hurtTimer > 0, 'Solo 1P Kid Mode grants hurt invulnerability frames');
+
+  // Checkpoint records stageId so startStage respawns at checkpoint
+  physics.setTileAt(level, 12, 13, TILE.CHECKPOINT);
+  p.x = 12 * TUNE.tileSize;
+  p.y = 13 * TUNE.tileSize;
+  p.hurtTimer = 0;
+  physics.updatePlayer(p, {}, level, state);
+  assert.ok(state.checkpoint && state.checkpoint.stageId === 'test-1', 'Checkpoint must record stageId');
+
+  // Moving platform carries player horizontally
+  level.platforms = [{ x: 20 * 32, y: 10 * 32, w: 96, h: 12, dx: 3 }];
+  p.x = 20 * 32 + 16;
+  p.y = 10 * 32 - p.h - 2;
+  p.vx = 0;
+  p.vy = 4;
+  physics.moveWithSubsteps(p, level, state);
+  assert.equal(p.onGround, true, 'Player lands on moving platform');
+  assert.equal(p.x, 20 * 32 + 19, 'Moving platform dx carries player horizontally');
+});
+

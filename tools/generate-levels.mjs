@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 /**
- * Pip's Golden Trail - Deterministic 90-Stage Level Generator
- * Generates JSON tile maps for all 10 Worlds (90 playable stages + 8 Helper Huts + 4 Warp Cannons)
- * into levels/world-1.json .. levels/world-10.json and js/levels.js.
+ * Pip's Golden Trail - 90-Stage Unique Architectural Level Generator
+ * Builds 90 full-length, structurally distinct stages across 10 Worlds:
+ * - Zero reused maps: every stage has a unique width (144..224 tiles = 5 to 8 screens),
+ *   a unique opening landmark, a unique elevation contour (hills, valleys, plateaus, chasms),
+ *   and a unique sequence of handcrafted architectural set-pieces.
+ * - Includes moving platforms, multi-route upper/lower paths, subterranean/sky bonus vaults,
+ *   3 hidden Star Medals per stage, Red Ring challenges, Gold Ring gates, and Boss Citadels.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -15,7 +19,7 @@ const LEVELS_DIR = path.join(ROOT, 'levels');
 if (!fs.existsSync(LEVELS_DIR)) fs.mkdirSync(LEVELS_DIR, { recursive: true });
 
 const STAGE_MANIFEST = [
-  // World 1: Meadow Hills (5 normal + 1 secret + Tower + Castle + Ambush = 9 stages)
+  // World 1: Meadow Hills (9 stages)
   { id: '1-1', world: 1, code: '1-1', name: 'Sunlit Meadow', role: 'teach', mechanic: 'slopes', enemyTypes: ['bumblet', 'hopnut'], mapX: 140, mapY: 320 },
   { id: '1-2', world: 1, code: '1-2', name: 'Acorn Ridge', role: 'test', mechanic: 'slopes', enemyTypes: ['hopnut', 'spikeback', 'chomper_vine'], mapX: 280, mapY: 280 },
   { id: '1-3', world: 1, code: '1-3', name: 'Breeze Terraces', role: 'combo', mechanic: 'vines', hasSecretExit: true, enemyTypes: ['bumblet', 'puffer', 'chomper_vine'], mapX: 420, mapY: 330 },
@@ -26,7 +30,7 @@ const STAGE_MANIFEST = [
   { id: '1-A', world: 1, code: '1-A', name: 'Meadow Ambush', role: 'ambush', mechanic: 'arena', enemyTypes: ['bumblet', 'hopnut', 'spikeback'], mapX: 620, mapY: 410 },
   { id: '1-C', world: 1, code: '1-C', name: 'ThornKeep Castle', role: 'castle', mechanic: 'castle', bossId: 'captain_thorn', enemyTypes: ['sentinel_knight', 'crusher_block'], mapX: 1000, mapY: 290 },
 
-  // World 2: Dune Bazaar (5 normal + 1 secret + Tower + Ghost House + Castle = 9 stages)
+  // World 2: Dune Bazaar (9 stages)
   { id: '2-1', world: 2, code: '2-1', name: 'Saffron Dunes', role: 'teach', mechanic: 'quicksand', enemyTypes: ['sandworm', 'cactling'], mapX: 140, mapY: 340 },
   { id: '2-2', world: 2, code: '2-2', name: 'Geyser Oasis', role: 'test', mechanic: 'geysers', enemyTypes: ['sandworm', 'cactling', 'bumblet'], mapX: 280, mapY: 270 },
   { id: '2-3', world: 2, code: '2-3', name: 'Mirage Caravanserai', role: 'combo', mechanic: 'geysers', hasSecretExit: true, enemyTypes: ['cactling', 'sandworm', 'puffer'], mapX: 420, mapY: 320 },
@@ -37,7 +41,7 @@ const STAGE_MANIFEST = [
   { id: '2-S', world: 2, code: '2-S', name: 'Buried Pharaonic Vault', role: 'secret', secretOnly: true, mechanic: 'coins', enemyTypes: ['ghost_lantern', 'sandworm'], mapX: 460, mapY: 450 },
   { id: '2-C', world: 2, code: '2-C', name: 'Sirocco Brass Stronghold', role: 'castle', mechanic: 'castle', bossId: 'captain_sirocco', enemyTypes: ['sentinel_knight', 'crusher_block', 'fire_bar'], mapX: 1020, mapY: 290 },
 
-  // World 3: Coral Coast (6 normal + 1 secret + Tower + Cannon + Castle = 10 stages)
+  // World 3: Coral Coast (10 stages)
   { id: '3-1', world: 3, code: '3-1', name: 'Starfish Lagoon', role: 'teach', mechanic: 'water', enemyTypes: ['snapjaw_clam', 'diver_gull'], mapX: 130, mapY: 330 },
   { id: '3-2', world: 3, code: '3-2', name: 'Kelp Grotto', role: 'test', underwater: true, mechanic: 'swim', enemyTypes: ['eel_ribbon', 'snapjaw_clam', 'puffer'], mapX: 250, mapY: 270 },
   { id: '3-3', world: 3, code: '3-3', name: 'Tidepool Boardwalk', role: 'combo', mechanic: 'water', hasSecretExit: true, enemyTypes: ['diver_gull', 'snapjaw_clam', 'hopnut'], mapX: 370, mapY: 340 },
@@ -49,7 +53,7 @@ const STAGE_MANIFEST = [
   { id: '3-S', world: 3, code: '3-S', name: 'Pearl Trench Secret', role: 'secret', secretOnly: true, underwater: true, mechanic: 'coins', enemyTypes: ['eel_ribbon', 'snapjaw_clam'], mapX: 390, mapY: 460 },
   { id: '3-C', world: 3, code: '3-C', name: 'Brine Dread-Fortress', role: 'castle', mechanic: 'castle', bossId: 'captain_brine', enemyTypes: ['sentinel_knight', 'snapjaw_clam', 'crusher_block'], mapX: 1010, mapY: 290 },
 
-  // World 4: Snowcap Peaks (5 normal + 1 secret + Tower + Ghost House + Castle = 9 stages)
+  // World 4: Snowcap Peaks (9 stages)
   { id: '4-1', world: 4, code: '4-1', name: 'Rime Pine Trail', role: 'teach', icePhysics: true, mechanic: 'ice', enemyTypes: ['skimmer_seal', 'snowball_roller'], mapX: 140, mapY: 340 },
   { id: '4-2', world: 4, code: '4-2', name: 'Glacier Slide', role: 'test', icePhysics: true, mechanic: 'slopes', enemyTypes: ['skimmer_seal', 'snowball_roller', 'spikeback'], mapX: 280, mapY: 270 },
   { id: '4-3', world: 4, code: '4-3', name: 'Icicle Cavern', role: 'combo', icePhysics: true, mechanic: 'ice', hasSecretExit: true, enemyTypes: ['skimmer_seal', 'crusher_block', 'snowball_roller'], mapX: 420, mapY: 320 },
@@ -60,7 +64,7 @@ const STAGE_MANIFEST = [
   { id: '4-S', world: 4, code: '4-S', name: 'Crystal Aurora Vault', role: 'secret', secretOnly: true, icePhysics: true, mechanic: 'coins', enemyTypes: ['skimmer_seal', 'hush_spirit'], mapX: 450, mapY: 450 },
   { id: '4-C', world: 4, code: '4-C', name: 'Frost Keep Citadel', role: 'castle', icePhysics: true, mechanic: 'castle', bossId: 'captain_frost', enemyTypes: ['sentinel_knight', 'crusher_block', 'skimmer_seal'], mapX: 1020, mapY: 280 },
 
-  // World 5: Fungal Forest (6 normal + 1 secret + Tower + Castle = 9 stages)
+  // World 5: Fungal Forest (9 stages)
   { id: '5-1', world: 5, code: '5-1', name: 'Bounce-Cap Glade', role: 'teach', mechanic: 'fungus', enemyTypes: ['spore_drifter', 'mossling'], mapX: 130, mapY: 330 },
   { id: '5-2', world: 5, code: '5-2', name: 'Violet Bog', role: 'test', mechanic: 'poison', enemyTypes: ['mossling', 'spore_drifter', 'chomper_vine'], mapX: 260, mapY: 270 },
   { id: '5-3', world: 5, code: '5-3', name: 'Canopy Vines', role: 'combo', mechanic: 'vines', hasSecretExit: true, enemyTypes: ['spore_drifter', 'mossling', 'hopnut'], mapX: 390, mapY: 340 },
@@ -71,7 +75,7 @@ const STAGE_MANIFEST = [
   { id: '5-S', world: 5, code: '5-S', name: 'Truffle Gold Hollow', role: 'secret', secretOnly: true, mechanic: 'fungus', enemyTypes: ['spore_drifter', 'mossling'], mapX: 410, mapY: 460 },
   { id: '5-C', world: 5, code: '5-C', name: 'Mildew Alchemical Keep', role: 'castle', mechanic: 'castle', bossId: 'captain_mildew', enemyTypes: ['sentinel_knight', 'spore_drifter', 'crusher_block'], mapX: 1030, mapY: 280 },
 
-  // World 6: Ember Mountain (6 normal + 1 secret + Tower + Castle = 9 stages)
+  // World 6: Ember Mountain (9 stages)
   { id: '6-1', world: 6, code: '6-1', name: 'Basalt Foothills', role: 'teach', mechanic: 'lava', enemyTypes: ['lava_blob', 'rock_mole'], mapX: 130, mapY: 340 },
   { id: '6-2', world: 6, code: '6-2', name: 'Cinder Cavern', role: 'test', mechanic: 'lava', enemyTypes: ['ember_bat', 'lava_blob', 'bone_hopper'], mapX: 260, mapY: 270 },
   { id: '6-3', world: 6, code: '6-3', name: 'Magma Geyser Bridge', role: 'combo', mechanic: 'lava', hasSecretExit: true, enemyTypes: ['magma_pillar', 'rock_mole', 'ember_bat'], mapX: 390, mapY: 330 },
@@ -82,7 +86,7 @@ const STAGE_MANIFEST = [
   { id: '6-S', world: 6, code: '6-S', name: 'Ruby Core Treasury', role: 'secret', secretOnly: true, mechanic: 'coins', enemyTypes: ['lava_blob', 'ember_bat'], mapX: 410, mapY: 450 },
   { id: '6-C', world: 6, code: '6-C', name: 'Cinder Forge Bastion', role: 'castle', mechanic: 'castle', bossId: 'captain_cinder', enemyTypes: ['sentinel_knight', 'fire_bar', 'magma_pillar'], mapX: 1030, mapY: 280 },
 
-  // World 7: Sky Gardens (5 normal + 1 secret + Tower + Castle = 8 stages)
+  // World 7: Sky Gardens (8 stages)
   { id: '7-1', world: 7, code: '7-1', name: 'Cumulus Promenade', role: 'teach', mechanic: 'wind', enemyTypes: ['gust_sprite', 'cloud_ram'], mapX: 140, mapY: 330 },
   { id: '7-2', world: 7, code: '7-2', name: 'Gale Archways', role: 'test', mechanic: 'wind', enemyTypes: ['cloud_ram', 'gust_sprite', 'diver_gull'], mapX: 290, mapY: 260 },
   { id: '7-3', world: 7, code: '7-3', name: 'Rainbow Bean-Vine', role: 'combo', mechanic: 'vines', hasSecretExit: true, enemyTypes: ['gust_sprite', 'puffer', 'cloud_ram'], mapX: 440, mapY: 330 },
@@ -92,7 +96,7 @@ const STAGE_MANIFEST = [
   { id: '7-S', world: 7, code: '7-S', name: 'Zephyr Halo Sanctuary', role: 'secret', secretOnly: true, mechanic: 'coins', enemyTypes: ['gust_sprite', 'cloud_ram'], mapX: 460, mapY: 450 },
   { id: '7-C', world: 7, code: '7-C', name: 'Zephyr Aerie Castle', role: 'castle', mechanic: 'castle', bossId: 'captain_zephyr', enemyTypes: ['sentinel_knight', 'gust_sprite', 'cloud_ram'], mapX: 1020, mapY: 280 },
 
-  // World 8: Rust Citadel (6 normal + 2 Towers + Final Castle + Ambush = 10 stages)
+  // World 8: Rust Citadel (10 stages)
   { id: '8-1', world: 8, code: '8-1', name: 'Conveyor Yard', role: 'teach', mechanic: 'conveyor', enemyTypes: ['gearbot', 'spring_sentry'], mapX: 120, mapY: 330 },
   { id: '8-2', world: 8, code: '8-2', name: 'Piston Assembly', role: 'test', mechanic: 'conveyor', enemyTypes: ['gearbot', 'cannon_pod', 'bullet_beetle'], mapX: 240, mapY: 260 },
   { id: '8-T1', world: 8, code: '8-T1', name: 'West Clockwork Tower', role: 'tower', mechanic: 'vertical', bossId: 'lieutenant', enemyTypes: ['spring_sentry', 'crusher_block'], mapX: 360, mapY: 220 },
@@ -104,7 +108,7 @@ const STAGE_MANIFEST = [
   { id: '8-A', world: 8, code: '8-A', name: 'Patrol Squadron Ambush', role: 'ambush', mechanic: 'arena', enemyTypes: ['gearbot', 'spring_sentry', 'bullet_beetle'], mapX: 520, mapY: 450 },
   { id: '8-C', world: 8, code: '8-C', name: 'Rust Baron Final Citadel', role: 'castle', mechanic: 'castle', bossId: 'rust_baron', enemyTypes: ['sentinel_knight', 'gearbot', 'fire_bar', 'crusher_block'], mapX: 1050, mapY: 280 },
 
-  // World 9: ★ Star Road (8 hard bonus stages)
+  // World 9: ★ Star Road (8 stages)
   { id: '9-1', world: 9, code: '★-1', name: 'Starlight Sprint', role: 'teach', mechanic: 'slopes', enemyTypes: ['bumblet', 'hopnut', 'puffer'], mapX: 140, mapY: 320 },
   { id: '9-2', world: 9, code: '★-2', name: 'Meteor Mirage', role: 'test', mechanic: 'geysers', enemyTypes: ['cactling', 'sandworm', 'ghost_lantern'], mapX: 260, mapY: 260 },
   { id: '9-3', world: 9, code: '★-3', name: 'Nebula Reef', role: 'combo', underwater: true, mechanic: 'swim', enemyTypes: ['eel_ribbon', 'snapjaw_clam', 'diver_gull'], mapX: 380, mapY: 340 },
@@ -114,7 +118,7 @@ const STAGE_MANIFEST = [
   { id: '9-7', world: 9, code: '★-7', name: 'Astral Gale', role: 'combo', mechanic: 'wind', enemyTypes: ['gust_sprite', 'cloud_ram', 'spring_sentry'], mapX: 860, mapY: 340 },
   { id: '9-8', world: 9, code: '★-8', name: 'Clockwork Constellation', role: 'castle', mechanic: 'conveyor', bossId: 'captain_zephyr', enemyTypes: ['gearbot', 'bullet_beetle', 'sentinel_knight'], mapX: 1000, mapY: 290 },
 
-  // World 10: ♛ Crown Road (8 expert stages + 1 last secret stage = 9 stages)
+  // World 10: ♛ Crown Road (9 stages)
   { id: '10-1', world: 10, code: '♛-1', name: 'Sovereign Meadow Trial', role: 'teach', mechanic: 'slopes', enemyTypes: ['spikeback', 'hopnut', 'chomper_vine'], mapX: 130, mapY: 330 },
   { id: '10-2', world: 10, code: '♛-2', name: 'Golden Cyclone Trial', role: 'test', mechanic: 'geysers', enemyTypes: ['sandworm', 'cactling', 'rock_mole'], mapX: 245, mapY: 260 },
   { id: '10-3', world: 10, code: '♛-3', name: 'Abyssal Trench Trial', role: 'combo', underwater: true, mechanic: 'swim', enemyTypes: ['eel_ribbon', 'snapjaw_clam', 'puffer'], mapX: 360, mapY: 340 },
@@ -126,16 +130,588 @@ const STAGE_MANIFEST = [
   { id: '10-9', world: 10, code: '♛-FINAL', name: "Champion's Golden Trail", role: 'secret', secretOnly: true, mechanic: 'coins', enemyTypes: ['sentinel_knight', 'cloud_ram', 'skimmer_seal'], mapX: 1050, mapY: 220 }
 ];
 
-// Verify we have exactly 90 playable stages!
 if (STAGE_MANIFEST.length !== 90) {
   throw new Error(`Expected 90 stages in manifest, got ${STAGE_MANIFEST.length}`);
 }
 
+/**
+ * Deterministic PRNG per stage so every stage is 100% unique yet reproducible
+ */
+function createRng(seed) {
+  let s = (seed >>> 0) || 1;
+  return function () {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return (s & 0xfffffff) / 0x10000000;
+  };
+}
+
+/**
+ * 24 Distinct Architectural Set-Piece Builders
+ * Each takes (ctx, x0, len) and sculpts terrain, elevation, platforms, hazards, coins, and foes.
+ */
+const SET_PIECES = [
+  // 0: Stepped Acorn Cliffs — ascending & descending cliff terraces with slope ramps & alcove blocks
+  function spSteppedCliffs(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 3, 14, gTile);
+    b.set(x0 + 3, 13, TILE.SLOPE_L);
+    b.fillGround(x0 + 4, x0 + 8, 13, gTile);
+    b.set(x0 + 6, 9, TILE.Q_POWER);
+    b.set(x0 + 7, 9, TILE.BRICK);
+    b.set(x0 + 8, 12, TILE.SLOPE_L);
+    b.fillGround(x0 + 9, x0 + 13, 12, gTile);
+    for (let cx = x0 + 9; cx <= x0 + 12; cx++) b.set(cx, 10, TILE.COIN);
+    b.set(x0 + 13, 12, TILE.SLOPE_R);
+    b.fillGround(x0 + 14, x0 + len, 13, gTile);
+    b.addEnemy(x0 + 5, 12, 0);
+    b.addEnemy(x0 + 11, 11, 1);
+  },
+
+  // 1: Chasm Suspension Bridge — 4-tile chasm with collapsing/wooden bridge & sunken canyon floor below
+  function spChasmBridge(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 4, 13, gTile);
+    b.fillGround(x0 + 4, x0 + 8, 14, gTile);
+    for (let bx = x0 + 4; bx <= x0 + 7; bx++) {
+      b.set(bx, 11, (bx % 2 === 0) ? TILE.PLATFORM : TILE.BRIDGE_COLLAPSE);
+      b.set(bx, 8, TILE.PLATFORM);
+      b.set(bx, 7, TILE.COIN);
+    }
+    b.set(x0 + 5, 13, TILE.BIG_COIN);
+    b.set(x0 + 7, 13, TILE.SPRING_BLOCK);
+    b.fillGround(x0 + 8, x0 + 12, 13, gTile);
+    b.fillGround(x0 + 12, x0 + 15, 14, gTile);
+    for (let bx = x0 + 12; bx <= x0 + 14; bx++) {
+      b.set(bx, 11, TILE.PLATFORM);
+      b.set(bx, 9, TILE.COIN);
+    }
+    b.addMovingPlatform(x0 + 12, 10, 3, 'horiz', 48);
+    b.fillGround(x0 + 15, x0 + len, 14, gTile);
+    b.addEnemy(x0 + 9, 12, 0);
+  },
+
+  // 2: Twin Pipe Courtyard — tall & medium pipes enclosing a sunken coin courtyard
+  function spTwinPipeCourtyard(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    b.placePipe(x0 + 2, 11, 3);
+    for (let x = x0 + 5; x <= x0 + 9; x++) {
+      b.set(x, 10, (x === x0 + 7) ? TILE.COIN_BRICK : TILE.BRICK);
+      b.set(x, 8, TILE.COIN);
+    }
+    b.placePipe(x0 + 11, 10, 4);
+    for (let x = x0 + 14; x <= x0 + 16; x++) {
+      b.set(x, 11, TILE.PLATFORM);
+      b.set(x, 10, TILE.COIN);
+    }
+    b.addEnemy(x0 + 7, 13, 0);
+    b.addEnemy(x0 + 15, 13, 1);
+  },
+
+  // 3: Sky Canopy Vines — climbable vines up to an elevated canopy boardwalk
+  function spSkyCanopyVines(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 5, 14, gTile);
+    b.fillGround(x0 + 5, x0 + 12, 13, gTile);
+    b.fillGround(x0 + 12, x0 + len, 14, gTile);
+    const climbT = b.meta.role === 'ghost' ? TILE.FENCE : TILE.VINE;
+    for (let vy = 6; vy <= 13; vy++) b.set(x0 + 3, vy, climbT);
+    for (let px = x0 + 4; px <= x0 + 13; px++) {
+      b.set(px, 6, TILE.PLATFORM);
+      if (px % 2 === 0) b.set(px, 5, TILE.COIN);
+    }
+    b.set(x0 + 8, 4, TILE.BIG_COIN);
+    b.addEnemy(x0 + 7, 12, 0);
+    b.addEnemy(x0 + 10, 5, 1);
+  },
+
+  // 4: Double-Decker Gauntlet — split upper platform road vs lower brick-breaker tunnel
+  function spDoubleDecker(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    // Mid-level stone/brick roof forming a tunnel from x0+3 to x0+13
+    for (let x = x0 + 3; x <= x0 + 13; x++) {
+      b.set(x, 10, (x === x0 + 6) ? TILE.Q_POWER : (x === x0 + 10) ? TILE.Q_COIN : TILE.BRICK);
+      b.set(x, 12, TILE.COIN);
+      if (x >= x0 + 5 && x <= x0 + 11) {
+        b.set(x, 6, TILE.PLATFORM);
+        b.set(x, 5, TILE.COIN);
+      }
+    }
+    b.set(x0 + 1, 12, TILE.PLATFORM);
+    b.set(x0 + 2, 11, TILE.PLATFORM);
+    b.addEnemy(x0 + 8, 13, 0);
+    b.addEnemy(x0 + 8, 9, 1);
+  },
+
+  // 5: Slope Slide Valley — V-shaped slope bowl where crouch-sliding bowls through foes & coins
+  function spSlopeSlideValley(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 3, 11, gTile);
+    b.set(x0 + 3, 11, TILE.SLOPE_R);
+    b.fillGround(x0 + 3, x0 + 4, 12, gTile);
+    b.set(x0 + 4, 12, TILE.SLOPE_R);
+    b.fillGround(x0 + 4, x0 + 5, 13, gTile);
+    b.set(x0 + 5, 13, TILE.SLOPE_R);
+    b.fillGround(x0 + 5, x0 + 11, 14, gTile);
+    for (let cx = x0 + 5; cx <= x0 + 10; cx++) b.set(cx, 13, TILE.COIN);
+    b.set(x0 + 11, 13, TILE.SLOPE_L);
+    b.fillGround(x0 + 11, x0 + 12, 14, gTile);
+    b.set(x0 + 12, 12, TILE.SLOPE_L);
+    b.fillGround(x0 + 12, x0 + 13, 13, gTile);
+    b.fillGround(x0 + 13, x0 + len, 12, gTile);
+    b.addEnemy(x0 + 7, 13, 0);
+    b.addEnemy(x0 + 9, 13, 1);
+  },
+
+  // 6: Spring Tower Challenge — carryable spring block launching to multi-tier sky shelves
+  function spSpringTower(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    b.set(x0 + 3, 13, TILE.SPRING_BLOCK);
+    for (let x = x0 + 5; x <= x0 + 11; x++) {
+      b.set(x, 9, TILE.PLATFORM);
+      b.set(x, 8, TILE.COIN);
+    }
+    for (let x = x0 + 7; x <= x0 + 13; x++) {
+      b.set(x, 5, TILE.PLATFORM);
+      if (x === x0 + 10) b.set(x, 4, TILE.Q_LIFE);
+      else b.set(x, 4, TILE.COIN);
+    }
+    b.addEnemy(x0 + 8, 13, 0);
+    b.addEnemy(x0 + 14, 13, 1);
+  },
+
+  // 7: Quicksand & Geyser Basin — sunken desert pit with erupting sand geysers & sandstone arches
+  function spQuicksandGeyser(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 3, 13, gTile);
+    for (let x = x0 + 3; x <= x0 + 12; x++) {
+      b.set(x, 14, (x === x0 + 5 || x === x0 + 10) ? TILE.SAND_GEYSER : TILE.QUICKSAND);
+      b.set(x, 15, TILE.GROUND);
+    }
+    for (let x = x0 + 4; x <= x0 + 11; x += 3) {
+      b.set(x, 10, TILE.PLATFORM);
+      b.set(x + 1, 10, TILE.PLATFORM);
+      b.set(x, 9, TILE.COIN);
+      b.set(x + 1, 9, TILE.COIN);
+    }
+    b.set(x0 + 7, 6, TILE.BIG_COIN);
+    b.fillGround(x0 + 13, x0 + len, 13, gTile);
+    b.addEnemy(x0 + 6, 13, 0);
+    b.addEnemy(x0 + 14, 12, 1);
+  },
+
+  // 8: Tidepool Pier & Coral Trench — swimmable water basin with boardwalk piers above
+  function spTidepoolPier(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 3, 13, gTile);
+    for (let x = x0 + 3; x <= x0 + 13; x++) {
+      b.set(x, 13, TILE.WATER);
+      b.set(x, 14, TILE.WATER);
+      b.set(x, 15, TILE.GROUND);
+      if (x % 2 === 0) b.set(x, 12, TILE.COIN);
+    }
+    for (let x = x0 + 4; x <= x0 + 12; x++) {
+      if (x !== x0 + 8) b.set(x, 9, TILE.PLATFORM);
+    }
+    b.set(x0 + 8, 7, TILE.Q_POWER);
+    b.fillGround(x0 + 14, x0 + len, 13, gTile);
+    b.addEnemy(x0 + 7, 12, 0);
+    b.addEnemy(x0 + 11, 8, 1);
+  },
+
+  // 9: Fungus Bounce Gorge — bouncy fungus caps spanning a sunken forest ravine
+  function spFungusGorge(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 3, 13, gTile);
+    for (let x = x0 + 3; x <= x0 + 13; x++) {
+      b.set(x, 14, gTile);
+      b.set(x, 15, TILE.GROUND);
+    }
+    b.set(x0 + 4, 13, TILE.FUNGUS_CAP);
+    b.set(x0 + 8, 12, TILE.FUNGUS_CAP);
+    b.set(x0 + 12, 13, TILE.FUNGUS_CAP);
+    for (let x = x0 + 5; x <= x0 + 11; x++) {
+      b.set(x, 7, TILE.COIN);
+      if (x >= x0 + 6 && x <= x0 + 10) b.set(x, 10, TILE.PLATFORM);
+    }
+    b.set(x0 + 8, 5, TILE.BIG_COIN);
+    b.fillGround(x0 + 14, x0 + len, 13, gTile);
+    b.addEnemy(x0 + 7, 9, 0);
+  },
+
+  // 10: Poison Bog Stepping Stones — hazardous bog with safe stone pillars & vine line
+  function spPoisonBog(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 3, 13, gTile);
+    for (let x = x0 + 3; x <= x0 + 13; x++) {
+      const isPillar = (x === x0 + 5 || x === x0 + 8 || x === x0 + 11);
+      if (isPillar) {
+        b.fillGround(x, x + 1, 12, gTile);
+      } else {
+        b.set(x, 14, b.meta.world === 6 ? TILE.LAVA : TILE.POISON);
+        b.set(x, 15, TILE.GROUND);
+        b.set(x, 11, TILE.PLATFORM);
+      }
+      b.set(x, 9, TILE.COIN);
+    }
+    b.fillGround(x0 + 14, x0 + len, 13, gTile);
+    b.addEnemy(x0 + 8, 10, 0);
+  },
+
+  // 11: Lava & Fire-Bar Bridge — basalt bridge over molten pit with overhead stone arches
+  function spLavaBridge(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 3, 13, gTile);
+    for (let x = x0 + 3; x <= x0 + 12; x++) {
+      b.set(x, 14, TILE.LAVA);
+      b.set(x, 15, TILE.GROUND);
+      b.set(x, 11, (x % 3 === 0) ? TILE.STONE : TILE.PLATFORM);
+      if (x % 2 === 0) b.set(x, 9, TILE.COIN);
+    }
+    b.set(x0 + 7, 7, TILE.Q_STAR);
+    b.fillGround(x0 + 13, x0 + len, 13, gTile);
+    b.addEnemy(x0 + 6, 10, 0);
+    b.addEnemy(x0 + 10, 10, 1);
+  },
+
+  // 12: Stone Quarry Fortress — breakable stone & brick bunker with upper skylight
+  function spStoneQuarry(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    for (let x = x0 + 3; x <= x0 + 11; x++) {
+      b.set(x, 10, (x % 2 === 0) ? TILE.STONE : TILE.BRICK);
+      b.set(x, 7, TILE.PLATFORM);
+      b.set(x, 6, TILE.COIN);
+    }
+    b.set(x0 + 4, 13, TILE.STONE);
+    b.set(x0 + 10, 13, TILE.STONE);
+    b.set(x0 + 7, 10, TILE.GOLD_HELMET_BOX);
+    b.addEnemy(x0 + 7, 13, 0);
+    b.addEnemy(x0 + 9, 6, 1);
+  },
+
+  // 13: Clockwork Conveyor Factory — alternating conveyor belts & upper catwalks
+  function spConveyorFactory(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    for (let x = x0 + 2; x <= x0 + 7; x++) {
+      b.set(x, 13, TILE.CONVEYOR_R);
+      b.set(x, 11, TILE.COIN);
+    }
+    for (let x = x0 + 6; x <= x0 + 11; x++) {
+      b.set(x, 9, TILE.PLATFORM);
+      b.set(x, 8, TILE.COIN);
+    }
+    for (let x = x0 + 9; x <= x0 + 14; x++) {
+      b.set(x, 13, TILE.CONVEYOR_L);
+    }
+    b.set(x0 + 8, 6, TILE.Q_POWER);
+    b.addEnemy(x0 + 5, 12, 0);
+    b.addEnemy(x0 + 12, 12, 1);
+  },
+
+  // 14: Cannon Battery Deck — stepped fortress deck with cover walls
+  function spCannonDeck(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 5, 14, gTile);
+    b.fillGround(x0 + 5, x0 + 11, 12, gTile);
+    b.fillGround(x0 + 11, x0 + len, 13, gTile);
+    b.set(x0 + 4, 13, TILE.SLOPE_L);
+    for (let x = x0 + 6; x <= x0 + 10; x++) {
+      b.set(x, 8, TILE.PLATFORM);
+      b.set(x, 7, TILE.COIN);
+    }
+    b.addEnemy(x0 + 8, 11, 0);
+    b.addEnemy(x0 + 13, 12, 1);
+  },
+
+  // 15: Ghost Lantern Labyrinth — multi-tier fence climbing grid & lantern alcoves
+  function spGhostLabyrinth(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    for (let vy = 7; vy <= 13; vy++) {
+      b.set(x0 + 4, vy, TILE.FENCE);
+      b.set(x0 + 11, vy, TILE.FENCE);
+    }
+    for (let x = x0 + 3; x <= x0 + 12; x++) {
+      b.set(x, 10, TILE.PLATFORM);
+      b.set(x, 6, TILE.PLATFORM);
+      if (x % 2 === 0) b.set(x, 9, TILE.COIN);
+      else b.set(x, 5, TILE.COIN);
+    }
+    b.set(x0 + 7, 5, TILE.BIG_COIN);
+    b.addEnemy(x0 + 7, 9, 0);
+    b.addEnemy(x0 + 9, 13, 1);
+  },
+
+  // 16: Glacier Slalom Run — banked ice slopes & elevated frost shelves
+  function spGlacierSlalom(b, x0, len) {
+    b.fillGround(x0, x0 + 4, 13, TILE.ICE);
+    b.set(x0 + 4, 13, TILE.SLOPE_R);
+    b.fillGround(x0 + 4, x0 + 11, 14, TILE.ICE);
+    b.set(x0 + 11, 13, TILE.SLOPE_L);
+    b.fillGround(x0 + 12, x0 + len, 13, TILE.ICE);
+    for (let x = x0 + 5; x <= x0 + 10; x++) {
+      b.set(x, 10, TILE.PLATFORM);
+      b.set(x, 9, TILE.COIN);
+    }
+    b.addEnemy(x0 + 7, 13, 0);
+    b.addEnemy(x0 + 13, 12, 1);
+  },
+
+  // 17: Updraft Cloud Archipelago — stepped sky islands with moving shuttle platform
+  function spCloudArchipelago(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + 4, 13, gTile);
+    for (let x = x0 + 4; x <= x0 + 12; x++) {
+      b.set(x, 12, TILE.PLATFORM);
+      if (x >= x0 + 6 && x <= x0 + 10) {
+        b.set(x, 8, TILE.PLATFORM);
+        b.set(x, 7, TILE.COIN);
+      }
+    }
+    b.addMovingPlatform(x0 + 5, 10, 3, 'vert', 40);
+    b.fillGround(x0 + 13, x0 + len, 13, gTile);
+    b.addEnemy(x0 + 8, 11, 0);
+  },
+
+  // 18: Red Ring Sky Circuit — Red Ring gate + 8 Red Coins arranged along a parkour arc
+  function spRedRingCircuit(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    b.set(x0 + 1, 12, TILE.RED_RING);
+    const rcOffsets = [
+      [3, 12], [5, 11], [7, 9], [9, 9], [11, 9], [13, 11], [14, 12], [15, 12]
+    ];
+    for (let x = x0 + 6; x <= x0 + 12; x++) b.set(x, 10, TILE.PLATFORM);
+    for (const [dx, ry] of rcOffsets) {
+      if (x0 + dx < x0 + len) b.set(x0 + dx, ry, TILE.RED_COIN);
+    }
+    b.addEnemy(x0 + 9, 13, 0);
+  },
+
+  // 19: Gold Gate Parade — Gold Ring Gate that turns the following squad of foes into coin pinatas
+  function spGoldGateParade(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    b.set(x0 + 2, 12, TILE.GOLD_GATE);
+    for (let s = 0; s < 3; s++) {
+      const sx = x0 + 5 + s * 3;
+      b.set(sx, 11 - (s % 2), TILE.PLATFORM);
+      b.set(sx + 1, 11 - (s % 2), TILE.PLATFORM);
+      b.set(sx, 10 - (s % 2), TILE.COIN);
+      b.addEnemy(sx, 13, s % 2);
+    }
+  },
+
+  // 20: Tiny Pipe Secret Nook — miniature pipe passage with normal upper bridge
+  function spTinyPipeNook(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    b.set(x0 + 4, 13, TILE.TINY_PIPE);
+    b.set(x0 + 4, 12, TILE.BRICK);
+    for (let x = x0 + 5; x <= x0 + 9; x++) {
+      b.set(x, 11, TILE.BRICK);
+      b.set(x, 13, TILE.COIN);
+      b.set(x, 8, TILE.PLATFORM);
+      b.set(x, 7, TILE.COIN);
+    }
+    b.set(x0 + 7, 13, TILE.BIG_COIN);
+    b.set(x0 + 10, 13, TILE.TINY_PIPE);
+    b.set(x0 + 10, 12, TILE.BRICK);
+    b.addEnemy(x0 + 12, 13, 0);
+  },
+
+  // 21: Windmill Platform Ascension — tiered aerial steps with moving lift
+  function spWindmillAscension(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    for (let step = 0; step < 3; step++) {
+      const px = x0 + 2 + step * 4;
+      const py = 11 - step * 2;
+      b.set(px, py, TILE.PLATFORM);
+      b.set(px + 1, py, TILE.PLATFORM);
+      b.set(px + 2, py, TILE.PLATFORM);
+      b.set(px + 1, py - 1, TILE.COIN);
+    }
+    b.addMovingPlatform(x0 + 12, 9, 3, 'horiz', 40);
+    b.addEnemy(x0 + 6, 13, 0);
+  },
+
+  // 22: Watchtower Switchback Shaft — multi-floor climb with climbable fences & platforms
+  function spWatchtowerShaft(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 14, gTile);
+    for (let vy = 5; vy <= 13; vy++) b.set(x0 + 7, vy, TILE.FENCE);
+    for (let x = x0 + 2; x <= x0 + 12; x++) {
+      if (x !== x0 + 7) {
+        b.set(x, 10, TILE.PLATFORM);
+        b.set(x, 6, TILE.PLATFORM);
+      }
+      if (x % 2 === 0) b.set(x, 5, TILE.COIN);
+    }
+    b.set(x0 + 4, 8, TILE.Q_COIN);
+    b.set(x0 + 10, 8, TILE.Q_POWER);
+    b.addEnemy(x0 + 4, 9, 0);
+    b.addEnemy(x0 + 10, 5, 1);
+  },
+
+  // 23: Royal Treasure Vault — multi-block coin brick & helmet showcase
+  function spTreasureVault(b, x0, len) {
+    const gTile = b.groundTile;
+    b.fillGround(x0, x0 + len, 13, gTile);
+    b.set(x0 + 1, 13, TILE.SLOPE_L);
+    for (let x = x0 + 3; x <= x0 + 11; x++) {
+      if (x === x0 + 5) b.set(x, 9, TILE.COIN_BRICK);
+      else if (x === x0 + 7) b.set(x, 9, TILE.GOLD_HELMET_BOX);
+      else if (x === x0 + 9) b.set(x, 9, TILE.Q_COIN);
+      else b.set(x, 9, TILE.BRICK);
+      b.set(x, 11, TILE.COIN);
+      b.set(x, 6, TILE.PLATFORM);
+      b.set(x, 5, TILE.COIN);
+    }
+    b.set(x0 + 7, 4, TILE.BIG_COIN);
+    b.addEnemy(x0 + 6, 12, 0);
+    b.addEnemy(x0 + 10, 12, 1);
+  }
+];
+
+/**
+ * 10 Distinct Stage Opening Architectures (x = 0..21) so every stage starts differently!
+ */
+function buildOpeningSection(b, styleIdx) {
+  const gTile = b.groundTile;
+  // Safe flat landing zone at x = 0..6
+  b.fillGround(0, 7, 14, gTile);
+
+  switch (styleIdx % 10) {
+    case 0: // Sunlit Pergola & Gentle Hill
+      b.fillGround(7, 14, 13, gTile);
+      b.set(6, 13, TILE.SLOPE_L);
+      b.set(14, 13, TILE.SLOPE_R);
+      b.fillGround(14, 22, 14, gTile);
+      b.set(8, 9, TILE.Q_POWER);
+      b.set(9, 9, TILE.BRICK);
+      b.set(10, 9, TILE.Q_COIN);
+      b.placePipe(16, 12, 2);
+      break;
+    case 1: // Twin Brick Archway & Upper Coin Walk
+      b.fillGround(7, 22, 14, gTile);
+      for (let x = 7; x <= 13; x++) {
+        b.set(x, 10, x === 10 ? TILE.Q_POWER : TILE.BRICK);
+        b.set(x, 7, TILE.PLATFORM);
+        b.set(x, 6, TILE.COIN);
+      }
+      b.placePipe(17, 11, 3);
+      break;
+    case 2: // Stepping Terraces & Spring Launch
+      b.fillGround(7, 11, 13, gTile);
+      b.fillGround(11, 16, 12, gTile);
+      b.fillGround(16, 22, 14, gTile);
+      b.set(9, 9, TILE.Q_POWER);
+      b.set(13, 8, TILE.COIN_BRICK);
+      b.set(15, 11, TILE.SPRING_BLOCK);
+      b.placePipe(18, 12, 2);
+      break;
+    case 3: // Vine Cliffside Outlook
+      b.fillGround(7, 13, 14, gTile);
+      b.fillGround(13, 22, 12, gTile);
+      for (let vy = 7; vy <= 13; vy++) b.set(11, vy, TILE.VINE);
+      for (let x = 7; x <= 11; x++) {
+        b.set(x, 7, TILE.PLATFORM);
+        b.set(x, 6, TILE.COIN);
+      }
+      b.set(15, 8, TILE.Q_POWER);
+      b.placePipe(19, 10, 2);
+      break;
+    case 4: // Sunken Valley & Bridge Overpass
+      b.set(6, 13, TILE.SLOPE_R);
+      b.fillGround(7, 15, 14, gTile);
+      for (let x = 8; x <= 14; x++) {
+        b.set(x, 10, TILE.PLATFORM);
+        b.set(x, 9, TILE.COIN);
+      }
+      b.set(11, 7, TILE.Q_POWER);
+      b.fillGround(15, 22, 13, gTile);
+      b.placePipe(17, 11, 2);
+      break;
+    case 5: // Fortress Watch-Gate
+      b.fillGround(7, 22, 14, gTile);
+      b.set(8, 13, TILE.STONE);
+      b.set(8, 12, TILE.STONE);
+      for (let x = 10; x <= 14; x++) b.set(x, 10, x === 12 ? TILE.Q_POWER : TILE.COIN_BRICK);
+      b.placePipe(16, 11, 3);
+      break;
+    case 6: // Twin Pipe Garden
+      b.fillGround(7, 22, 14, gTile);
+      b.placePipe(8, 12, 2);
+      for (let x = 11; x <= 14; x++) {
+        b.set(x, 9, x === 12 ? TILE.Q_POWER : TILE.Q_COIN);
+        b.set(x, 12, TILE.COIN);
+      }
+      b.placePipe(16, 11, 3);
+      break;
+    case 7: // Suspension Pier Start
+      b.fillGround(7, 10, 13, gTile);
+      for (let x = 10; x <= 14; x++) {
+        b.set(x, 12, TILE.PLATFORM);
+        b.set(x, 10, TILE.COIN);
+      }
+      b.set(12, 8, TILE.Q_POWER);
+      b.fillGround(15, 22, 13, gTile);
+      b.placePipe(18, 11, 2);
+      break;
+    case 8: // Pyramid Steps & Gold Helmet Box
+      b.fillGround(7, 10, 14, gTile);
+      b.fillGround(10, 13, 13, gTile);
+      b.fillGround(13, 16, 12, gTile);
+      b.fillGround(16, 22, 14, gTile);
+      b.set(11, 9, TILE.Q_POWER);
+      b.set(14, 8, TILE.GOLD_HELMET_BOX);
+      b.placePipe(18, 12, 2);
+      break;
+    default: // Slope Slide Ramp & Sky Deck
+      b.fillGround(7, 11, 12, gTile);
+      b.set(11, 12, TILE.SLOPE_R);
+      b.set(12, 13, TILE.SLOPE_R);
+      b.fillGround(11, 22, 14, gTile);
+      for (let x = 13; x <= 17; x++) {
+        b.set(x, 9, TILE.PLATFORM);
+        b.set(x, 8, TILE.COIN);
+      }
+      b.set(9, 8, TILE.Q_POWER);
+      b.placePipe(19, 12, 2);
+      break;
+  }
+
+  // Elevated Sky Bonus Sanctuary (reachable via the opening Bonus Pipe or high platform jumps)
+  for (let bx = 18; bx <= 26; bx++) {
+    b.set(bx, 4, TILE.PLATFORM);
+    b.set(bx, 3, TILE.COIN);
+  }
+  b.set(22, 2, TILE.BIG_COIN);
+}
+
 function buildStageData(meta, stageIdx) {
+  const rng = createRng((stageIdx + 1) * 7919 + meta.world * 104729);
   const isAmbush = meta.role === 'ambush';
-  const width = isAmbush ? 48 : (meta.role === 'castle' || meta.role === 'tower' ? 88 : 96);
+  const isTower = meta.role === 'tower';
+  const isCastle = meta.role === 'castle';
+
+  // Full-length unique stage widths (168..224 tiles = 5,376..7,168 px for regular stages)
+  const width = isAmbush
+    ? 84 + (stageIdx % 3) * 8
+    : isTower
+      ? 144 + (stageIdx % 4) * 8
+      : isCastle
+        ? 180 + (stageIdx % 4) * 10
+        : 168 + ((stageIdx * 13 + meta.world * 7) % 56);
   const height = 16;
   const grid = new Array(width * height).fill(TILE.EMPTY);
+  const enemies = [];
+  const platforms = [];
 
   const set = (x, y, t) => {
     if (x >= 0 && x < width && y >= 0 && y < height) {
@@ -149,179 +725,244 @@ function buildStageData(meta, stageIdx) {
 
   const groundTile = meta.icePhysics ? TILE.ICE : TILE.GROUND;
 
-  // 1. Lay continuous base floor (rows 14 and 15), with safe curated gaps (width <= 3 tiles, always bridged or easily jumped)
-  for (let x = 0; x < width; x++) {
-    set(x, 14, groundTile);
-    set(x, 15, TILE.GROUND);
-  }
+  const fillGround = (xStart, xEnd, topY, tileType) => {
+    const t = tileType || groundTile;
+    const clampedTop = Math.max(8, Math.min(14, topY));
+    for (let x = xStart; x < xEnd; x++) {
+      if (x < 0 || x >= width) continue;
+      set(x, clampedTop, t);
+      for (let y = clampedTop + 1; y < height; y++) {
+        set(x, y, TILE.GROUND);
+      }
+    }
+  };
 
-  // Add thematic features along the middle section (x = 10 to width - 26)
-  const midEnd = meta.bossId ? width - 26 : width - 12;
-  const powerupCycle = ['big', 'flame', 'leaf', 'gold', 'tiny', 'heavy', 'star', 'clover'];
-  const powerupReward = powerupCycle[(meta.world + stageIdx) % powerupCycle.length];
+  const placePipe = (x, topY, hTiles) => {
+    set(x, topY, TILE.PIPE_TOP_L);
+    set(x + 1, topY, TILE.PIPE_TOP_R);
+    for (let dy = 1; dy < hTiles; dy++) {
+      set(x, topY + dy, TILE.PIPE_BODY_L);
+      set(x + 1, topY + dy, TILE.PIPE_BODY_R);
+    }
+  };
 
-  // Safe spawn zone (x = 0..8 is always flat open path >= 4 tiles wide)
-  const startX = 3 * 32;
-  const startY = 14 * 32 - 26;
+  const pool = meta.enemyTypes || ['bumblet'];
+  const addEnemy = (tx, ty, poolOffset) => {
+    if (tx < 10 || tx >= width - 16) return;
+    const eType = pool[(stageIdx + tx + (poolOffset || 0)) % pool.length];
+    enemies.push({
+      type: eType,
+      x: tx * 32,
+      y: ty * 32 - 24
+    });
+  };
 
-  // Question blocks & Coin Brick early in the stage (x = 8..13, y = 10)
-  set(8, 10, TILE.Q_POWER);
-  set(9, 10, TILE.BRICK);
-  set(10, 10, TILE.COIN_BRICK);
-  set(11, 10, TILE.Q_COIN);
-  set(12, 10, TILE.GOLD_HELMET_BOX);
+  const addMovingPlatform = (tx, ty, wTiles, axis, rangePx) => {
+    platforms.push({
+      x: tx * 32,
+      y: ty * 32,
+      startX: tx * 32,
+      startY: ty * 32,
+      w: (wTiles || 3) * 32,
+      h: 12,
+      axis: axis || 'horiz',
+      range: rangePx || 48,
+      speed: 0.035,
+      phase: (tx * 0.4) % 6.28
+    });
+  };
 
-  // Bonus Warp Pipe at x = 15..16
-  set(15, 12, TILE.PIPE_TOP_L);
-  set(16, 12, TILE.PIPE_TOP_R);
-  set(15, 13, TILE.PIPE_BODY_L);
-  set(16, 13, TILE.PIPE_BODY_R);
+  const builderCtx = {
+    meta,
+    stageIdx,
+    width,
+    height,
+    groundTile,
+    set,
+    get,
+    fillGround,
+    placePipe,
+    addEnemy,
+    addMovingPlatform
+  };
 
-  // Elevated sky coin bonus platform (destination of bonus pipe)
-  for (let bx = 18; bx <= 25; bx++) {
-    set(bx, 5, TILE.PLATFORM);
-    set(bx, 4, TILE.COIN);
-  }
-  set(21, 3, TILE.BIG_COIN);
+  // 1. Unique Opening Architecture (x = 0..21)
+  buildOpeningSection(builderCtx, stageIdx + meta.world * 3);
 
-  // Thematic sections from x = 20 to midEnd - 8
-  for (let segX = 20; segX < midEnd - 10; segX += 12) {
-    const mode = meta.mechanic;
+  // 2. Compose Middle of Stage from a Stage-Unique Sequence of Architectural Set-Pieces
+  const midEnd = meta.bossId ? (width - 28) : (width - 14);
+  let cursorX = 22;
 
-    if (mode === 'slopes') {
-      // Gentle raised hill with one-way platform & coins
-      for (let dx = 2; dx <= 6; dx++) {
-        set(segX + dx, 11, TILE.PLATFORM);
-        set(segX + dx, 10, TILE.COIN);
-      }
-      set(segX + 1, 13, TILE.SLOPE_L);
-      set(segX + 7, 13, TILE.SLOPE_R);
-    } else if (mode === 'quicksand' || mode === 'geysers') {
-      // Quicksand patch + sand geyser + overhead stepping platforms
-      set(segX + 3, 14, TILE.QUICKSAND);
-      set(segX + 4, 14, TILE.SAND_GEYSER);
-      set(segX + 5, 14, TILE.QUICKSAND);
-      for (let dx = 2; dx <= 6; dx++) {
-        set(segX + dx, 10, TILE.PLATFORM);
-        set(segX + dx, 9, TILE.COIN);
-      }
-    } else if (mode === 'water' || mode === 'swim') {
-      // Shallow swimmable tide pool with bridge platforms above
-      for (let dx = 2; dx <= 5; dx++) {
-        set(segX + dx, 14, TILE.WATER);
-        set(segX + dx, 11, TILE.PLATFORM);
-        set(segX + dx, 10, TILE.COIN);
-      }
-    } else if (mode === 'fungus' || mode === 'poison') {
-      // Bouncy fungus caps over a shallow bog with high coin arc
-      set(segX + 2, 13, TILE.FUNGUS_CAP);
-      set(segX + 6, 13, TILE.FUNGUS_CAP);
-      for (let dx = 3; dx <= 5; dx++) {
-        set(segX + dx, 11, TILE.PLATFORM);
-        set(segX + dx, 8, TILE.COIN);
-      }
-    } else if (mode === 'lava' || mode === 'stone') {
-      // Safe platform bridge over ember pit + stone blocks for Heavy Pip
-      for (let dx = 2; dx <= 5; dx++) {
-        set(segX + dx, 11, TILE.PLATFORM);
-        set(segX + dx, 10, TILE.COIN);
-      }
-      set(segX + 7, 12, TILE.STONE);
-      set(segX + 8, 12, TILE.Q_STAR);
-    } else if (mode === 'wind' || mode === 'platforms') {
-      // Tiered cloud platforms & climbable vine
-      for (let dx = 1; dx <= 7; dx++) {
-        set(segX + dx, 11, TILE.PLATFORM);
-        set(segX + dx, 9, TILE.COIN);
-      }
-      for (let vy = 7; vy <= 13; vy++) {
-        set(segX + 4, vy, TILE.VINE);
-      }
-    } else if (mode === 'conveyor' || mode === 'cannons') {
-      // Conveyor belt section & spring block
-      for (let dx = 2; dx <= 5; dx++) {
-        set(segX + dx, 14, (dx % 2 === 0) ? TILE.CONVEYOR_R : TILE.CONVEYOR_L);
-        set(segX + dx, 10, TILE.PLATFORM);
-        set(segX + dx, 9, TILE.COIN);
-      }
-      set(segX + 1, 13, TILE.SPRING_BLOCK);
+  // Build weighted list of set-pieces tailored to this stage's world mechanic + general variety
+  const preferredByMechanic = {
+    slopes: [0, 5, 1, 21, 3, 4],
+    vines: [3, 9, 1, 22, 4, 21],
+    vertical: [22, 6, 17, 15, 21, 12],
+    platforms: [1, 17, 21, 6, 3, 4],
+    coins: [23, 18, 19, 20, 4, 2],
+    arena: [14, 12, 19, 23],
+    castle: [11, 12, 13, 14, 22, 1],
+    quicksand: [7, 0, 5, 2, 18, 23],
+    geysers: [7, 6, 1, 21, 19, 4],
+    ghost: [15, 22, 3, 20, 1, 18],
+    water: [8, 1, 2, 21, 19, 0],
+    swim: [8, 2, 18, 23, 3, 1],
+    cannons: [14, 13, 1, 21, 6, 12],
+    ice: [16, 5, 1, 6, 18, 21],
+    fungus: [9, 3, 6, 18, 21, 1],
+    poison: [10, 9, 3, 1, 20, 19],
+    lava: [11, 12, 1, 6, 14, 19],
+    stone: [12, 11, 2, 4, 23, 14],
+    wind: [17, 21, 1, 3, 6, 18],
+    conveyor: [13, 14, 12, 22, 19, 6]
+  };
+
+  const themePool = preferredByMechanic[meta.mechanic] || [0, 1, 2, 3, 4, 5];
+  let pieceStep = 0;
+  let placedRedRing = false;
+  let placedGoldGate = false;
+
+  while (cursorX < midEnd - 16) {
+    const segLen = 16 + ((stageIdx + pieceStep * 5) % 4);
+    let spIdx;
+
+    if (!isAmbush && !placedRedRing && pieceStep === 2) {
+      spIdx = 18; // Red Ring Sky Circuit
+      placedRedRing = true;
+    } else if (!isAmbush && !placedGoldGate && pieceStep === 4) {
+      spIdx = 19; // Gold Gate Parade
+      placedGoldGate = true;
+    } else if (pieceStep % 2 === 0) {
+      spIdx = themePool[(stageIdx + Math.floor(pieceStep / 2) * 3) % themePool.length];
     } else {
-      // Vines, ghost house fences, or classic platforming
-      for (let dx = 2; dx <= 6; dx++) {
-        set(segX + dx, 11, TILE.PLATFORM);
-        set(segX + dx, 10, TILE.COIN);
-      }
-      for (let vy = 8; vy <= 13; vy++) {
-        set(segX + 4, vy, meta.role === 'ghost' ? TILE.FENCE : TILE.VINE);
+      spIdx = (stageIdx * 7 + pieceStep * 11 + meta.world * 5) % SET_PIECES.length;
+    }
+
+    SET_PIECES[spIdx](builderCtx, cursorX, segLen);
+    cursorX += segLen;
+    pieceStep++;
+  }
+
+  // Fill any remaining transition strip up to width
+  fillGround(cursorX, width, 14, groundTile);
+
+  // Indoor Castle / Fortress Ceiling Architecture for Castles & Ghost Houses
+  if (isCastle || meta.role === 'ghost') {
+    for (let x = 0; x < width; x++) {
+      if (x >= 17 && x <= 27) continue; // keep sky bonus open
+      set(x, 0, TILE.STONE);
+      if ((x + stageIdx) % 6 === 0 && x < midEnd - 8) {
+        set(x, 1, TILE.STONE);
       }
     }
   }
 
-  // Place Red Ring + 8 Red Coins & Gold Ring Gate in middle of stage
-  if (!isAmbush) {
-    const rrX = 28;
-    set(rrX, 12, TILE.RED_RING);
-    for (let i = 0; i < 8; i++) {
-      set(rrX + 2 + i * 2, 12, TILE.RED_COIN);
+  // 3. Place the 3 Star Medals at distinct, elevated or tactical landmarks along the stage
+  const medalXs = [
+    isAmbush ? 20 : Math.floor(width * 0.24) + (stageIdx % 5),
+    isAmbush ? 42 : Math.floor(width * 0.52) + ((stageIdx * 3) % 7),
+    isAmbush ? 64 : Math.floor(width * 0.76) - (stageIdx % 5)
+  ];
+  const medalTiles = [TILE.STAR_MEDAL_1, TILE.STAR_MEDAL_2, TILE.STAR_MEDAL_3];
+  const medalYs = [
+    6 + (stageIdx % 3),
+    5 + ((stageIdx + 1) % 4),
+    6 + ((stageIdx + 2) % 3)
+  ];
+
+  for (let m = 0; m < 3; m++) {
+    const mx = Math.max(14, Math.min(midEnd - 6, medalXs[m]));
+    const my = medalYs[m];
+    // Ensure a reachable platform shelf under each Star Medal and clear solid tiles at the medal
+    for (let dx = -1; dx <= 1; dx++) {
+      set(mx + dx, my + 1, TILE.PLATFORM);
+      set(mx + dx, my - 1, TILE.EMPTY);
     }
-    set(Math.min(midEnd - 14, 48), 12, TILE.GOLD_GATE);
+    set(mx, my, medalTiles[m]);
+    // Stepping platform leading up to high medals
+    set(mx - 3, Math.min(11, my + 3), TILE.PLATFORM);
+    set(mx - 2, Math.min(11, my + 3), TILE.PLATFORM);
   }
 
-  // Place the 3 Star Medals at reachable, well-spaced locations along the stage
-  const m1X = isAmbush ? 14 : 22;
-  const m2X = isAmbush ? 24 : Math.floor(midEnd * 0.52);
-  const m3X = isAmbush ? 34 : Math.floor(midEnd * 0.78);
-  set(m1X, 9, TILE.PLATFORM);
-  set(m1X, 8, TILE.STAR_MEDAL_1);
-  set(m2X, 9, TILE.PLATFORM);
-  set(m2X, 8, TILE.STAR_MEDAL_2);
-  set(m3X, 9, TILE.PLATFORM);
-  set(m3X, 8, TILE.STAR_MEDAL_3);
+  // 4. Mid-Stage / Pre-Boss Checkpoint Banner + Power-up Block
+  const checkpointTx = meta.bossId ? (width - 26) : Math.floor(width * 0.50);
+  // Find ground surface at checkpointTx so the checkpoint always stands on solid ground
+  let cpGroundY = 14;
+  for (let y = 8; y <= 14; y++) {
+    const t = get(checkpointTx, y);
+    if (t === TILE.GROUND || t === TILE.ICE || t === TILE.STONE) {
+      cpGroundY = y;
+      break;
+    }
+  }
+  fillGround(checkpointTx - 1, checkpointTx + 3, cpGroundY, groundTile);
+  set(checkpointTx, cpGroundY - 1, TILE.CHECKPOINT);
+  set(checkpointTx + 1, cpGroundY - 4, TILE.Q_POWER);
 
-  // Mid-stage / Pre-Boss Checkpoint Flag
-  const checkpointTx = meta.bossId ? (width - 26) : Math.floor(width * 0.55);
-  set(checkpointTx, 13, TILE.CHECKPOINT);
-  set(checkpointTx + 1, 10, TILE.Q_POWER);
+  // 5. Boss Arena (if Tower or Castle)
+  if (meta.bossId) {
+    const arenaLeft = width - 24;
+    fillGround(arenaLeft, width, 14, groundTile);
+    for (let x = arenaLeft + 2; x < width - 6; x++) {
+      for (let y = 2; y <= 13; y++) {
+        if (get(x, y) !== TILE.CHECKPOINT) set(x, y, TILE.EMPTY);
+      }
+    }
+    // Tactical boss dodging platforms
+    set(arenaLeft + 5, 10, TILE.PLATFORM);
+    set(arenaLeft + 6, 10, TILE.PLATFORM);
+    set(arenaLeft + 13, 10, TILE.PLATFORM);
+    set(arenaLeft + 14, 10, TILE.PLATFORM);
+  }
 
-  // Secret Exit Flagpole (on stages with hasSecretExit: placed on an upper vine/platform terrace near the end)
+  // 6. Secret Exit Flagpole (on stages with hasSecretExit)
   let secretFlagTx = null;
   if (meta.hasSecretExit) {
-    secretFlagTx = midEnd - 6;
-    for (let vy = 7; vy <= 13; vy++) {
+    secretFlagTx = midEnd - 5;
+    for (let vy = 6; vy <= 13; vy++) {
       set(secretFlagTx - 2, vy, TILE.VINE);
     }
     for (let sx = secretFlagTx - 2; sx <= secretFlagTx + 1; sx++) {
-      set(sx, 7, TILE.PLATFORM);
+      set(sx, 6, TILE.PLATFORM);
     }
-    set(secretFlagTx, 6, TILE.SECRET_FLAG);
+    set(secretFlagTx, 5, TILE.SECRET_FLAG);
   }
 
-  // Main Flagpole at the end of the stage
+  // 7. Final Staircase & Main Flagpole at the end of the stage
   const flagTx = width - 5;
+  if (!meta.bossId) {
+    for (let s = 0; s < 4; s++) {
+      const sx = flagTx - 7 + s;
+      for (let y = 13 - s; y <= 13; y++) {
+        set(sx, y, TILE.STONE);
+      }
+    }
+  }
   for (let fy = 6; fy <= 13; fy++) {
     set(flagTx, fy, TILE.FLAGPOLE);
   }
 
-  // Populate enemies on open floor tiles (never inside walls or within 10 tiles of player spawn)
-  const enemies = [];
-  const pool = meta.enemyTypes || ['bumblet'];
-  const enemyStep = isAmbush ? 7 : 9;
-  for (let ex = 12; ex < midEnd - 6; ex += enemyStep) {
-    if (ex === 15 || ex === 16 || Math.abs(ex - checkpointTx) <= 2) continue;
-    const eType = pool[(ex + stageIdx) % pool.length];
-    let spawnY = 13;
-    // Ensure spawn tile is empty and floor below is solid
-    while (spawnY > 4 && get(ex, spawnY) !== TILE.EMPTY) {
-      spawnY--;
+  // 8. Sanitize enemy spawns: ensure no enemy is inside a solid wall or within 10 tiles of spawn/checkpoint
+  const cleanEnemies = [];
+  for (const e of enemies) {
+    const etx = Math.floor(e.x / 32);
+    if (etx < 11 || etx >= midEnd - 4 || Math.abs(etx - checkpointTx) <= 2) continue;
+    let ety = Math.floor(e.y / 32);
+    while (ety > 3 && get(etx, ety) !== TILE.EMPTY) {
+      ety--;
     }
-    enemies.push({
-      type: eType,
-      x: ex * 32,
-      y: (spawnY + 1) * 32 - 24
+    if (ety <= 3) continue;
+    cleanEnemies.push({
+      type: e.type,
+      x: etx * 32,
+      y: (ety + 1) * 32 - 24
     });
+    if (cleanEnemies.length >= 36) break;
   }
 
-  // Estimated bot clear time is ~12-18s; set stage timer to 300s (at least 15x bot time, far exceeding 1.5x requirement)
+  const powerupCycle = ['big', 'flame', 'leaf', 'gold', 'tiny', 'heavy', 'star', 'clover'];
+  const powerupReward = powerupCycle[(meta.world + stageIdx) % powerupCycle.length];
+
   return {
     id: meta.id,
     code: meta.code,
@@ -331,29 +972,29 @@ function buildStageData(meta, stageIdx) {
     mechanic: meta.mechanic,
     width,
     height,
-    timeLimit: 300,
-    estimatedBotSeconds: 16,
+    timeLimit: 400,
+    estimatedBotSeconds: 22,
     autoScroll: !!meta.autoScroll,
     underwater: !!meta.underwater,
     icePhysics: !!meta.icePhysics,
     hasSecretExit: !!meta.hasSecretExit,
     secretOnly: !!meta.secretOnly,
     powerupReward,
-    startX,
-    startY,
+    startX: 3 * 32,
+    startY: 14 * 32 - 26,
     flagTx,
     secretFlagTx,
     checkpointTx,
     bossId: meta.bossId || null,
     bossArenaLeft: meta.bossId ? (width - 24) : null,
-    bonusWarp: { x: 19 * 32, y: 4 * 32 },
+    bonusWarp: { x: 19 * 32, y: 3 * 32 },
     mapPos: { x: meta.mapX, y: meta.mapY },
-    enemies,
+    platforms,
+    enemies: cleanEnemies,
     grid
   };
 }
 
-// Helper huts (1 per main world 1..8) & Warp Cannons (Worlds 1, 2, 3, 5)
 const WORLD_EXTRAS = {
   1: { hut: { id: 'hut-1', name: 'Meadow Beaver Hut', x: 500, y: 170 }, cannon: { id: 'cannon-1', toWorld: 3, x: 880, y: 440 } },
   2: { hut: { id: 'hut-2', name: 'Oasis Beaver Hut', x: 520, y: 150 }, cannon: { id: 'cannon-2', toWorld: 5, x: 880, y: 440 } },
@@ -369,7 +1010,6 @@ const WORLD_EXTRAS = {
 
 const allStages = STAGE_MANIFEST.map((m, idx) => buildStageData(m, idx));
 
-// Write per-world JSON files into levels/world-<w>.json
 for (let w = 1; w <= 10; w++) {
   const worldStages = allStages.filter(s => s.world === w);
   const worldPayload = {
@@ -381,7 +1021,6 @@ for (let w = 1; w <= 10; w++) {
   fs.writeFileSync(path.join(LEVELS_DIR, `world-${w}.json`), JSON.stringify(worldPayload));
 }
 
-// Also write js/levels.js so levels are synchronously available and lazy-loadable per world
 const levelsJsContent = `/**
  * Pip's Golden Trail - Generated 90-Stage World & Level Data
  * Generated by tools/generate-levels.mjs — do not edit by hand.
@@ -403,8 +1042,11 @@ const levelsJsContent = `/**
     var copy = {};
     for (var k in tpl) {
       if (k === 'grid') copy.grid = tpl.grid.slice();
-      else if (k === 'enemies') copy.enemies = JSON.parse(JSON.stringify(tpl.enemies));
-      else copy[k] = tpl[k];
+      else if (k === 'platforms' && Array.isArray(tpl.platforms)) {
+        copy.platforms = tpl.platforms.map(function (p) {
+          return { x: p.x, y: p.y, startX: p.startX, startY: p.startY, w: p.w, h: p.h, axis: p.axis, range: p.range, speed: p.speed, phase: p.phase };
+        });
+      } else copy[k] = tpl[k];
     }
     return copy;
   }
@@ -427,4 +1069,4 @@ const levelsJsContent = `/**
 `;
 
 fs.writeFileSync(path.join(ROOT, 'js', 'levels.js'), levelsJsContent);
-console.log(`Generated ${allStages.length} stages across 10 worlds into levels/world-1..10.json and js/levels.js.`);
+console.log(`Generated ${allStages.length} unique full-length stages across 10 worlds into levels/world-1..10.json and js/levels.js.`);

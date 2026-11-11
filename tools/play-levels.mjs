@@ -41,13 +41,16 @@ try {
   const runCodeScript = `async (page) => {
     await page.waitForFunction(() => window.__GT_BOT__ && typeof window.__GT_BOT__.getStages === "function", { timeout: 10000 });
     await page.evaluate(async () => {
-      await new Promise((resolve, reject) => {
-        const sc = document.createElement("script");
-        sc.src = "js/game.js?fresh=" + Date.now();
-        sc.onload = resolve;
-        sc.onerror = reject;
-        document.head.appendChild(sc);
-      });
+      const files = ["js/levels.js", "js/physics.js", "js/render.js", "js/game.js"];
+      for (const f of files) {
+        await new Promise((resolve, reject) => {
+          const sc = document.createElement("script");
+          sc.src = f + "?fresh=" + Date.now();
+          sc.onload = resolve;
+          sc.onerror = reject;
+          document.head.appendChild(sc);
+        });
+      }
     });
     return await page.evaluate(() => {
       const stages = window.__GT_BOT__.getStages();

@@ -169,17 +169,28 @@ function checkStage(stage) {
 }
 
 console.log('=== Pip\'s Golden Trail: Level Verification (tools/check-levels.mjs) ===');
+const seenFingerprints = new Map();
+
 for (let w = 1; w <= 10; w++) {
   const file = path.join(LEVELS_DIR, `world-${w}.json`);
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
   for (const stage of data.stages) {
     totalStages++;
     const errs = checkStage(stage);
+
+    // Check layout uniqueness fingerprint
+    const fp = `${stage.width}:${stage.grid.join(',')}`;
+    if (seenFingerprints.has(fp)) {
+      errs.push(`Duplicate stage layout shared with ${seenFingerprints.get(fp)}`);
+    } else {
+      seenFingerprints.set(fp, stage.code);
+    }
+
     if (errs.length > 0) {
       totalErrors += errs.length;
       console.error(`✗ [${stage.code}] ${stage.name}: ${errs.join('; ')}`);
     } else {
-      console.log(`✓ [${stage.code}] ${stage.name} (${stage.width}x${stage.height}, ${stage.enemies.length} foes, 3 medals, timer ${stage.timeLimit}s)`);
+      console.log(`✓ [${stage.code}] ${stage.name} (${stage.width}x${stage.height}, ${stage.enemies.length} foes, ${(stage.platforms || []).length} lifts, 3 medals, timer ${stage.timeLimit}s)`);
     }
   }
 }
@@ -189,5 +200,6 @@ if (totalErrors > 0 || totalStages < 90) {
   console.error(`FAILED: ${totalErrors} errors across ${totalStages} stages.`);
   process.exit(1);
 } else {
-  console.log(`ALL GREEN: ${totalStages} stages verified across 10 worlds with 0 errors!`);
+  console.log(`ALL GREEN: ${totalStages} unique stages (${seenFingerprints.size} distinct layouts) verified across 10 worlds with 0 errors!`);
 }
+

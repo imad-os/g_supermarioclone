@@ -42,7 +42,7 @@
     menuIndex: 0,
     coopCount: 1,
     kidMode: true,
-    remoteAutoRun: true,
+    remoteAutoRun: false,
     speedMul: 1
   };
 
@@ -99,6 +99,61 @@
       ttl: 0
     });
   }
+  var particlesPool = [];
+  for (var ptIdx = 0; ptIdx < 32; ptIdx++) {
+    particlesPool.push({
+      active: false,
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      size: 5,
+      color: '#fde047',
+      ttl: 0
+    });
+  }
+  var popupsPool = [];
+  for (var ppIdx = 0; ppIdx < 12; ppIdx++) {
+    popupsPool.push({
+      active: false,
+      x: 0,
+      y: 0,
+      text: '+1',
+      color: '#fde047',
+      ttl: 0
+    });
+  }
+  var particleCursor = 0;
+  var popupCursor = 0;
+
+  function spawnParticleBurst(x, y, color, count) {
+    var n = count || 6;
+    for (var i = 0; i < n; i++) {
+      var pt = particlesPool[particleCursor];
+      particleCursor = (particleCursor + 1) & 31;
+      var ang = (i / n) * 6.283 + 0.3;
+      var spd = 1.8 + (i % 3) * 1.1;
+      pt.active = true;
+      pt.x = x + 12;
+      pt.y = y + 12;
+      pt.vx = Math.cos(ang) * spd;
+      pt.vy = Math.sin(ang) * spd - 1.8;
+      pt.size = 4 + (i & 3);
+      pt.color = color || '#fde047';
+      pt.ttl = 22 + (i % 10);
+    }
+  }
+
+  function spawnPopup(x, y, text, color) {
+    var pp = popupsPool[popupCursor];
+    popupCursor = (popupCursor + 1) % popupsPool.length;
+    pp.active = true;
+    pp.x = x + 12;
+    pp.y = y;
+    pp.text = text;
+    pp.color = color || '#fde047';
+    pp.ttl = 36;
+  }
 
   // Per-device held input state (mutated in-place, never reallocated)
   var devInputs = {
@@ -144,26 +199,62 @@
     players: players,
     enemies: enemiesPool,
     projectiles: projectilesPool,
+    particles: particlesPool,
+    popups: popupsPool,
+    deathTimer: 0,
     boss: null,
     onEvent: onPhysicsEvent
   };
 
   function onPhysicsEvent(kind, x, y, extra) {
-    if (kind === 'coin') audio.playSfx(extra >= 10 ? 'big_coin' : 'coin');
-    else if (kind === 'medal') audio.playSfx('medal');
-    else if (kind === 'powerup' || kind === 'star' || kind === 'gold_gate' || kind === 'red_ring') audio.playSfx('powerup');
-    else if (kind === 'life') audio.playSfx('life');
-    else if (kind === 'jump' || kind === 'swim') audio.playSfx('jump');
-    else if (kind === 'spin' || kind === 'swipe' || kind === 'spin_safe') audio.playSfx('spin');
-    else if (kind === 'hurt' || kind === 'death' || kind === 'bubble') audio.playSfx('hurt');
-    else if (kind === 'break') audio.playSfx('break');
-    else if (kind === 'bump') audio.playSfx('bump');
-    else if (kind === 'checkpoint') audio.playSfx('checkpoint');
-    else if (kind === 'flag') audio.playSfx('flag');
-    else if (kind === 'shoot') audio.playSfx('shoot');
-    else if (kind === 'bounce') audio.playSfx('bounce');
-    else if (kind === 'kick') audio.playSfx('kick');
-    else if (kind === 'boss_hit' || kind === 'boss_room' || kind === 'boss_defeated') audio.playSfx('boss_hit');
+    if (kind === 'coin') {
+      audio.playSfx(extra >= 10 ? 'big_coin' : 'coin');
+      spawnParticleBurst(x, y, '#fde047', extra >= 10 ? 8 : 4);
+      spawnPopup(x, y, '+' + (extra || 1), '#fde047');
+    } else if (kind === 'medal') {
+      audio.playSfx('medal');
+      spawnParticleBurst(x, y, '#facc15', 10);
+      spawnPopup(x, y, '★ MEDAL!', '#fef08a');
+    } else if (kind === 'powerup' || kind === 'star' || kind === 'gold_gate' || kind === 'red_ring') {
+      audio.playSfx('powerup');
+      spawnParticleBurst(x, y, '#4ade80', 8);
+      spawnPopup(x, y, kind === 'star' ? 'SHINING!' : 'POWER UP!', '#4ade80');
+    } else if (kind === 'life') {
+      audio.playSfx('life');
+      spawnParticleBurst(x, y, '#22c55e', 8);
+      spawnPopup(x, y, '1UP!', '#4ade80');
+    } else if (kind === 'jump' || kind === 'swim') {
+      audio.playSfx('jump');
+    } else if (kind === 'spin' || kind === 'swipe' || kind === 'spin_safe') {
+      audio.playSfx('spin');
+      spawnParticleBurst(x, y, '#38bdf8', 4);
+    } else if (kind === 'hurt' || kind === 'death' || kind === 'bubble') {
+      audio.playSfx('hurt');
+      spawnParticleBurst(x, y, '#ef4444', 6);
+    } else if (kind === 'break') {
+      audio.playSfx('break');
+      spawnParticleBurst(x, y, '#d97706', 8);
+    } else if (kind === 'bump') {
+      audio.playSfx('bump');
+    } else if (kind === 'checkpoint') {
+      audio.playSfx('checkpoint');
+      spawnParticleBurst(x, y, '#22c55e', 10);
+      spawnPopup(x, y, 'CHECKPOINT!', '#4ade80');
+    } else if (kind === 'flag') {
+      audio.playSfx('flag');
+      spawnParticleBurst(x, y, '#fde047', 12);
+    } else if (kind === 'shoot') {
+      audio.playSfx('shoot');
+    } else if (kind === 'bounce') {
+      audio.playSfx('bounce');
+      spawnParticleBurst(x, y, '#f472b6', 5);
+    } else if (kind === 'kick') {
+      audio.playSfx('kick');
+      spawnParticleBurst(x, y, '#fb923c', 5);
+    } else if (kind === 'boss_hit' || kind === 'boss_room' || kind === 'boss_defeated') {
+      audio.playSfx('boss_hit');
+      spawnParticleBurst(x, y, '#ef4444', 10);
+    }
   }
 
   function syncBodyDataset() {
@@ -217,7 +308,7 @@
    */
   function ensureWorldLoaded(worldNum) {
     if (typeof fetch === 'function') {
-      fetch('levels/world-' + worldNum + '.json?v=1.0.0').catch(function () {});
+      fetch('levels/world-' + worldNum + '.json?v=1.0.2').catch(function () {});
     }
   }
 
@@ -253,19 +344,17 @@
     playState.usedBonusPipe = false;
     playState.stageCleared = false;
     playState.secretExitUsed = false;
+    playState.deathTimer = 0;
 
     var numPlayers = options.players || uiState.coopCount || 1;
     var handicap = options.handicap || 1.0;
+    var hasCp = !!(playState.checkpoint && playState.checkpoint.stageId === lvl.id);
 
     for (var i = 0; i < 4; i++) {
       var p = players[i];
       var oldReserve = i === 0 ? slot.reserveItem : null;
-      var spawnX = (playState.checkpoint && playState.checkpoint.stageId === lvl.id)
-        ? playState.checkpoint.x
-        : lvl.startX - i * 22;
-      var spawnY = (playState.checkpoint && playState.checkpoint.stageId === lvl.id)
-        ? playState.checkpoint.y
-        : lvl.startY;
+      var spawnX = hasCp ? playState.checkpoint.x - i * 22 : lvl.startX - i * 22;
+      var spawnY = hasCp ? playState.checkpoint.y : lvl.startY;
 
       p.active = i < numPlayers;
       p.x = Math.max(32, spawnX);
@@ -284,7 +373,7 @@
       p.spinJumping = false;
       p.carrying = null;
       p.carriedBlockTile = 0;
-      p.hurtTimer = 0;
+      p.hurtTimer = 45;
       p.starTimer = 0;
       p.goldHelmetTimer = playState.coinRushActive ? TUNE.goldHelmetDurationFrames : 0;
       p.fireballCount = 0;
@@ -294,6 +383,8 @@
       p.transformTimer = 0;
     }
     playState.leader = players[0];
+    var maxCamX = Math.max(0, lvl.width * TUNE.tileSize - render.W);
+    playState.cameraX = Math.max(0, Math.min(maxCamX, players[0].x - render.W * 0.35));
 
     // Populate pooled enemies
     for (var j = 0; j < enemiesPool.length; j++) {
@@ -323,6 +414,12 @@
     for (var k = 0; k < projectilesPool.length; k++) {
       projectilesPool[k].active = false;
     }
+    for (var pt = 0; pt < particlesPool.length; pt++) {
+      particlesPool[pt].active = false;
+    }
+    for (var pp = 0; pp < popupsPool.length; pp++) {
+      popupsPool[pp].active = false;
+    }
 
     // Initialize Boss if Tower or Castle
     if (lvl.bossId) {
@@ -350,6 +447,40 @@
     var activeWindowLeft = camX - 160;
     var activeWindowRight = camX + render.W + 320;
     var p0 = playState.leader || players[0];
+
+    // Step moving platforms (level.platforms)
+    if (lvl.platforms) {
+      for (var mpIdx = 0; mpIdx < lvl.platforms.length; mpIdx++) {
+        var mp = lvl.platforms[mpIdx];
+        var prevX = mp.x;
+        var angle = playState.tick * (mp.speed || 0.035) + (mp.phase || 0);
+        if (mp.axis === 'vert') {
+          mp.y = mp.startY + Math.sin(angle) * (mp.range || 40);
+          mp.dx = 0;
+        } else {
+          mp.x = mp.startX + Math.sin(angle) * (mp.range || 48);
+          mp.dx = mp.x - prevX;
+        }
+      }
+    }
+
+    // Step particles & floating popups (Zero GC)
+    for (var ptIdx = 0; ptIdx < particlesPool.length; ptIdx++) {
+      var pt = particlesPool[ptIdx];
+      if (!pt.active) continue;
+      pt.x += pt.vx;
+      pt.y += pt.vy;
+      pt.vy += 0.25;
+      pt.ttl--;
+      if (pt.ttl <= 0) pt.active = false;
+    }
+    for (var ppIdx = 0; ppIdx < popupsPool.length; ppIdx++) {
+      var pp = popupsPool[ppIdx];
+      if (!pp.active) continue;
+      pp.y -= 0.9;
+      pp.ttl--;
+      if (pp.ttl <= 0) pp.active = false;
+    }
 
     // Step player projectiles
     for (var i = 0; i < projectilesPool.length; i++) {
@@ -539,9 +670,9 @@
           break;
         }
 
-        // Stomp / Spin Jump / Ground Pound from above
-        var comingFromAbove = pl.vy > 0 && (pl.y + pl.h - pl.vy) <= e.y + 14;
-        if (comingFromAbove || pl.groundPounding) {
+        // Stomp / Spin Jump / Ground Pound from above (generous handheld platformer stomp window)
+        var comingFromAbove = (pl.vy >= -0.8 && (pl.y + pl.h - Math.max(0, pl.vy)) <= e.y + e.h * 0.72) || pl.groundPounding || pl.spinJumping;
+        if (comingFromAbove) {
           if (def.spikeTop && !pl.spinJumping && !(pl.groundPounding && pl.form === 'heavy')) {
             physics.damagePlayer(pl, playState);
           } else {
@@ -552,9 +683,10 @@
               e.shellMoving = false;
               e.vx = 0;
               e.h = 18;
-            } else if (!def.spikeTop || pl.form === 'heavy') {
+            } else if (!def.spikeTop || pl.form === 'heavy' || pl.spinJumping) {
               e.active = false;
             }
+            spawnParticleBurst(e.x, e.y, '#fef08a', 6);
             physics.addCoins(playState, playState.goldEnemyTimer > 0 ? TUNE.goldEnemyCoinDrop : 1, e.x, e.y);
             audio.playSfx('stomp');
           }
@@ -891,6 +1023,17 @@
     }
 
     if (players[0].dead) {
+      if (!botActive) {
+        if (playState.deathTimer === 0) {
+          playState.deathTimer = 42;
+        }
+        playState.deathTimer--;
+        players[0].y += players[0].vy;
+        players[0].vy += 0.45;
+        if (playState.deathTimer > 0) {
+          return;
+        }
+      }
       if (playState.lives <= 0 && !botActive) {
         playState.lives = TUNE.startingLives;
         persistSave();
@@ -921,7 +1064,7 @@
       if (canvas) {
         canvas.width = render.W;
         canvas.height = render.H;
-        ctx = canvas.getContext('2d');
+        ctx = canvas.getContext('2d', { alpha: false });
       }
     }
     if (!ctx) return;
@@ -944,45 +1087,61 @@
   }
 
   var loopActive = false;
-  var paceTimer = 0;
-
-  function scheduleNextFrame() {
-    if (!loopActive || raf || paceTimer) return;
-    paceTimer = setTimeout(function () {
-      paceTimer = 0;
-      if (loopActive && !raf) {
-        raf = requestAnimationFrame(frame);
-      }
-    }, 8);
-  }
 
   function frame(ts) {
-    raf = 0;
-    if (!loopActive) return;
-    if (!lastTs) lastTs = ts;
-    accMs += Math.min(250, ts - lastTs) * uiState.speedMul;
+    if (!loopActive) {
+      raf = 0;
+      return;
+    }
+    raf = requestAnimationFrame(frame);
+
+    if (!lastTs) {
+      lastTs = ts;
+      step();
+      draw();
+      return;
+    }
+
+    var rawDt = ts - lastTs;
     lastTs = ts;
-    while (accMs >= TUNE.stepMs) {
+
+    // Prevent startup / tab-switch burst of catch-up steps
+    if (rawDt > 100 || rawDt < 0) {
+      accMs = 0;
+      step();
+      draw();
+      return;
+    }
+
+    // Native 60 Hz VSync fast-path: exactly 1 physics step per display refresh for zero micro-judder
+    if (uiState.speedMul === 1 && rawDt >= 11 && rawDt <= 23) {
+      accMs = 0;
+      step();
+      draw();
+      return;
+    }
+
+    accMs += rawDt * uiState.speedMul;
+    var steps = 0;
+    while (accMs >= TUNE.stepMs && steps < 2) {
       step();
       accMs -= TUNE.stepMs;
+      steps++;
     }
+    if (accMs > TUNE.stepMs) accMs = 0;
     draw();
-    scheduleNextFrame();
   }
 
   function startLoop() {
+    if (loopActive) return;
     loopActive = true;
     lastTs = 0;
     accMs = 0;
-    scheduleNextFrame();
+    raf = requestAnimationFrame(frame);
   }
 
   function stopLoop() {
     loopActive = false;
-    if (paceTimer) {
-      clearTimeout(paceTimer);
-      paceTimer = 0;
-    }
     if (raf) {
       cancelAnimationFrame(raf);
       raf = 0;
@@ -991,11 +1150,11 @@
 
   function resize() {
     if (!canvas || !ctx) return;
-    var dpr = qualityTier === 'low' ? 1 : Math.min(2, window.devicePixelRatio || 1);
-    var scale = Math.min(window.innerWidth / render.W, window.innerHeight / render.H) * dpr;
-    canvas.width = Math.max(480, Math.round(render.W * scale));
-    canvas.height = Math.max(270, Math.round(render.H * scale));
-    ctx.setTransform(canvas.width / render.W, 0, 0, canvas.height / render.H, 0, 0);
+    // Keep internal canvas resolution fixed at 960x540 and let the TV GPU composite/scale via CSS!
+    if (canvas.width !== render.W || canvas.height !== render.H) {
+      canvas.width = render.W;
+      canvas.height = render.H;
+    }
     draw();
   }
 
@@ -1090,7 +1249,11 @@
       if (screen === 'title') {
         return false; // Lets My PC open its own pause/quit menu!
       }
-      if (screen === 'play' || screen === 'hut' || screen === 'intro' || screen === 'ending') {
+      if (screen === 'play') {
+        openPauseModal();
+        return true;
+      }
+      if (screen === 'hut' || screen === 'intro' || screen === 'ending') {
         setScreen('map');
         return true;
       }
@@ -1348,10 +1511,28 @@
               physics.damageBoss(playState.boss, playState, 1);
             }
           } else {
-            players[0].x = Math.min(currentLevel.flagTx * TUNE.tileSize, players[0].x + 18);
+            var nextX = Math.min(currentLevel.flagTx * TUNE.tileSize, players[0].x + 24);
+            var nextTx = Math.floor((nextX + 12) / TUNE.tileSize);
+            var safeTy = 12;
+            for (var checkY = 12; checkY >= 3; checkY--) {
+              if (!physics.isSolidTile(physics.getTileAt(currentLevel, nextTx, checkY), false, false) &&
+                  !physics.isSolidTile(physics.getTileAt(currentLevel, nextTx, checkY - 1), false, false)) {
+                safeTy = checkY;
+                break;
+              }
+            }
+            players[0].x = nextX;
+            var curBotTy = Math.floor((players[0].y + players[0].h - 2) / TUNE.tileSize);
+            var curTopTy = Math.floor(players[0].y / TUNE.tileSize);
+            if (physics.isSolidTile(physics.getTileAt(currentLevel, nextTx, curBotTy), false, false) ||
+                physics.isSolidTile(physics.getTileAt(currentLevel, nextTx, curTopTy), false, false) ||
+                players[0].y > 13 * TUNE.tileSize) {
+              players[0].y = (safeTy + 1) * TUNE.tileSize - players[0].h - 2;
+              players[0].vy = 0;
+            }
             if (players[0].x >= (currentLevel.flagTx - 1) * TUNE.tileSize) {
               players[0].x = currentLevel.flagTx * TUNE.tileSize;
-              players[0].y = 12 * TUNE.tileSize;
+              players[0].y = 11 * TUNE.tileSize;
             }
             if (players[1].active) {
               players[1].x = Math.max(32, players[0].x - 28);
@@ -1364,8 +1545,17 @@
         frames++;
       }
 
+      var showcaseTx = Math.min(currentLevel.width - 28, 12 + ((frames * 7 + currentLevel.width * 3) % Math.max(24, currentLevel.width - 44)));
+      players[0].x = showcaseTx * TUNE.tileSize;
+      players[0].y = 10 * TUNE.tileSize;
+      players[0].hurtTimer = 0;
+      if (players[1].active) {
+        players[1].x = players[0].x - 36;
+        players[1].y = 10 * TUNE.tileSize;
+        players[1].hurtTimer = 0;
+      }
       var maxCam = Math.max(0, currentLevel.width * TUNE.tileSize - render.W);
-      playState.cameraX = Math.max(0, Math.min(maxCam, players[0].x - render.W * 0.55));
+      playState.cameraX = Math.max(0, Math.min(maxCam, players[0].x - render.W * 0.4));
       screen = 'play';
       modal = null;
       draw();
@@ -1396,7 +1586,7 @@
       // Read owner-configurable MyPC.app_config
       var cfg = MyPC.app_config || {};
       uiState.speedMul = +cfg.speed > 0 ? +cfg.speed : 1;
-      uiState.remoteAutoRun = cfg.remote_autorun !== false;
+      uiState.remoteAutoRun = cfg.remote_autorun === true;
       if (cfg.kid_mode === true || cfg.kid_mode === false) {
         uiState.kidMode = cfg.kid_mode;
       } else {
@@ -1406,7 +1596,10 @@
 
       saveObj = physics.sanitizeSaveData(MyPC.load(SAVE_KEY, null));
       canvas = document.getElementById('c');
-      ctx = canvas.getContext('2d');
+      canvas.width = render.W;
+      canvas.height = render.H;
+      ctx = canvas.getContext('2d', { alpha: false });
+      if (render.warmup) render.warmup();
       resize();
       window.addEventListener('resize', resize);
 

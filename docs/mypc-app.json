@@ -6,12 +6,12 @@
   "type": "game",
   "entry": "index.html",
   "icon": "icon.svg",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "scores": true,
   "config": {
     "orientation": "landscape",
     "kid_mode": "auto",
-    "remote_autorun": true,
+    "remote_autorun": false,
     "speed": 1
   },
   "touch": {
